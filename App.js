@@ -1,106 +1,85 @@
-import React, { Component } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, FlatList, SafeAreaView } from 'react-native';
-export default class Contacts extends Component {
 
+import React from 'react';
+import { SafeAreaView ,StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Alert } from 'react-native';
+
+
+export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      calls: [
-        { id: 1, name: "Anthony", status: "active", image: "https://image.flaticon.com/icons/png/512/2922/2922506.png" },
-        { id: 2, name: "Travis", status: "active", image: "https://img-premium.flaticon.com/png/512/3220/premium/3220365.png?token=exp=1628066885~hmac=8cdafa86ba07cc9ce647f339c1543b72" },
-        { id: 3, name: "Emily", status: "active", image: "https://image.flaticon.com/icons/png/512/2922/2922561.png" },
-        { id: 4, name: "Kevin", status: "offline", image: "https://image.flaticon.com/icons/png/512/2922/2922510.png" },
-        { id: 5, name: "Ed", status: "active", image: "https://img-premium.flaticon.com/png/512/3220/premium/3220404.png?token=exp=1628066893~hmac=a2b248ac3042ed679ba8491240e350b1" },
-        { id: 6, name: "Patrick", status: "active", image: "https://img-premium.flaticon.com/png/512/2813/premium/2813832.png?token=exp=1628066895~hmac=dcedf91ac891ffd0707b7e995662dde0" },
-        { id: 8, name: "Stella", status: "offline", image: "https://img-premium.flaticon.com/png/512/3220/premium/3220429.png?token=exp=1628066897~hmac=a7e267db0525f44e0df2da9b1e452029" },
-        { id: 9, name: "Ethan", status: "active", image: "https://image.flaticon.com/icons/png/512/2922/2922688.png" },
-        { id: 10, name: "Olivia", status: "active", image: "https://image.flaticon.com/icons/png/512/2922/2922558.png" },
-        { id: 11, name: "Alexander AAAAAAAAA", status: "offline", image: "https://img-premium.flaticon.com/png/512/3220/premium/3220451.png?token=exp=1628066904~hmac=eb6d40073c1404142947261c7df9a067" },
-        { id: 12, name: "Luna", status: "active", image: "https://image.flaticon.com/icons/png/512/554/554857.png" },
-        { id: 13, name: "Ava", status: "active", image: "https://image.flaticon.com/icons/png/512/5300/5300907.png" },
-        { id: 14, name: "Samuel BBBBBBBBBB", status: "offline", image: "https://image.flaticon.com/icons/png/512/5300/5300703.png" },
-        { id: 15, name: "Logan", status: "active", image: "https://image.flaticon.com/icons/png/512/5302/5302057.png" },
-        { id: 16, name: "Oliver", status: "active", image: "https://image.flaticon.com/icons/png/512/5300/5300643.png" },
-        { id: 17, name: "Lily", status: "offline", image: "https://image.flaticon.com/icons/png/512/5300/5300980.png" },
-        { id: 18, name: "Scarlett", status: "offline", image: "https://image.flaticon.com/icons/png/512/5301/5301028.png" },
-
-      ]
+      dataSource: []
     };
   }
-
-  renderItem = ({ item }) => {
-    return (
-      <TouchableOpacity>
-        <SafeAreaView style={styles.row}>
-          <Image source={{ uri: item.image }} style={styles.pic} />
-          <View>
-            <View style={styles.nameContainer}>
-              <Text style={styles.nameTxt} numberOfLines={1} ellipsizeMode="tail">{item.name}</Text>
-              <Text style={styles.mblTxt}>Call</Text>
-            </View>
-            <View style={styles.msgContainer}>
-              <Text style={styles.msgTxt}>{item.status}</Text>
-            </View>
-          </View>
-        </SafeAreaView>
-      </TouchableOpacity>
-    );
+                        
+  componentDidMount() {                           // compnent did mount 
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then(response => response.json())
+      .then((responseJson) => {
+        this.setState({
+          dataSource: responseJson         // data - dataSource
+        })
+      })
+      .catch(error => console.log(error)) //to catch the errors if any
   }
+
+// now complete your view content
 
   render() {
     return (
-      <View style={{ flex: 1 }} >
+      <SafeAreaView style={styles.container}>
         <FlatList
-          extraData={this.state}
-          data={this.state.calls}
-          keyExtractor={(item) => {
-            return item.id;
-          }}
-          renderItem={this.renderItem} />
-      </View>
+          style={{ flex: 1 }}
+          data={this.state.dataSource}
+          renderItem={({ item }) =>
+            <View style={styles.listItem}>
+              <Image source={{ uri: 'https://image.flaticon.com/icons/png/512/1256/1256650.png' }} style={styles.imageItem}  />
+              <View style={{ alignItems: "center", flex: 1 }}>
+                <Text style={{ fontWeight: "bold" }}>{item.name}</Text>
+                <Text>{item.email}</Text>
+                <Text>{item.company.name}</Text>
+              </View>
+              <TouchableOpacity onPress={() => Alert.alert('Phone No :'+ item.phone)}  style={styles.button}>   
+               <Text style={{ color: "green" }}>Call</Text>
+              </TouchableOpacity>
+            </View>
+          }
+
+          keyExtractor={item => item.id}
+        />
+      </SafeAreaView>
     );
   }
+
+
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: '#DCDCDC',
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    padding: 10,
+  container: {
+    flex: 1,
+    backgroundColor: '#F7F7F7',
+    marginTop: 60
   },
-  pic: {
-    borderRadius: 30,
+  listItem: {
+    margin: 10,
+    padding: 10,
+    backgroundColor: "#FFF",
+    width: "80%",
+    flex: 1,
+    alignSelf: "center",
+    flexDirection: "row",
+    borderRadius: 5
+  },
+  imageItem: {
     width: 60,
     height: 60,
+    borderRadius: 30
+
   },
-  nameContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: 280,
-  },
-  nameTxt: {
-    marginLeft: 15,
-    fontWeight: '600',
-    color: '#222',
-    fontSize: 18,
-    width: 170,
-  },
-  mblTxt: {
-    fontWeight: '200',
-    color: '#777',
-    fontSize: 13,
-  },
-  msgContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  msgTxt: {
-    fontWeight: '400',
-    color: '#008B8B',
-    fontSize: 12,
-    marginLeft: 15,
-  },
+  button: {
+    height: 50,
+    width: 50,
+    justifyContent: "center",
+    alignItems: "center"
+  }
+
 });
